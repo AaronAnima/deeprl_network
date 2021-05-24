@@ -10,6 +10,7 @@ from sumolib import checkBinary
 import time
 import traci
 import xml.etree.cElementTree as ET
+import pdb
 
 DEFAULT_PORT = 8000
 SEC_IN_MS = 1000
@@ -347,7 +348,6 @@ class TrafficSimulator:
             app = 'sumo'
         command = [checkBinary(app), '-c', sumocfg_file]
         command += ['--seed', str(seed)]
-        command += ['--remote-port', str(self.port)]
         command += ['--no-step-log', 'True']
         command += ['--time-to-teleport', '600'] # long teleport for safety
         command += ['--no-warnings', 'True']
@@ -356,10 +356,10 @@ class TrafficSimulator:
         if self.is_record:
             command += ['--tripinfo-output',
                         self.output_path + ('%s_%s_trip.xml' % (self.name, self.agent))]
-        subprocess.Popen(command)
         # wait 1s to establish the traci server
+        traci.start(command)
+        self.sim = traci
         time.sleep(1)
-        self.sim = traci.connect(port=self.port)
 
     def _init_sim_config(self):
         # needs to be overwriteen
