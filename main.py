@@ -24,6 +24,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--base-dir', type=str, required=False,
                         default=default_base_dir, help="experiment base dir")
+    parser.add_argument('--seed', type=int, default=0)
     subparsers = parser.add_subparsers(dest='option', help="train or evaluate")
     sp = subparsers.add_parser('train', help='train a single agent under base dir')
     sp.add_argument('--config-dir', type=str, required=False,
@@ -96,11 +97,12 @@ def train(args):
 
     # init centralized or multi agent
     seed = config.getint('ENV_CONFIG', 'seed')
+    # seed = args.seed
     model = init_agent(env, config['MODEL_CONFIG'], total_step, seed)
 
     # disable multi-threading for safe SUMO implementation
     summary_writer = tf.summary.FileWriter(dirs['log'])
-    trainer = Trainer(env, model, global_counter, summary_writer, output_path=dirs['data'])
+    trainer = Trainer(env, model, global_counter, summary_writer, output_path=dirs['data'], save_path=dirs['model'])
     trainer.run()
 
     # save model

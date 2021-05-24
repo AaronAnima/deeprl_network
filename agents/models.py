@@ -78,8 +78,10 @@ class IA2C:
         for i in range(self.n_agent):
             self.policy[i]._reset()
 
-    def save(self, model_dir, global_step):
-        self.saver.save(self.sess, model_dir + 'checkpoint', global_step=global_step)
+    def save(self, model_dir, global_step, is_best=False):
+        save_path = model_dir + 'checkpoint' + ('_best' if is_best else '')
+        global_step = 0 if is_best else global_step
+        self.saver.save(self.sess, save_path, global_step=global_step)
 
     def _init_algo(self, n_s_ls, n_a_ls, neighbor_mask, distance_mask, coop_gamma,
                    total_step, seed, model_config):

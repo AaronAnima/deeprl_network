@@ -1,0 +1,6 @@
+old_logs
+old_configs
+logs
+__pycache__
+.git
+.ipynd_checkpoints

@@ -6,6 +6,7 @@ import time
 import os
 import pandas as pd
 import subprocess
+from collections import deque
 
 
 def check_dir(cur_dir):
@@ -97,8 +98,8 @@ class Counter:
         return self.stop
 
 
-class Trainer():
-    def __init__(self, env, model, global_counter, summary_writer, output_path=None):
+class Trainer:
+    def __init__(self, env, model, global_counter, summary_writer, output_path=None, save_path=None):
         self.cur_step = 0
         self.global_counter = global_counter
         self.env = env
@@ -112,6 +113,10 @@ class Trainer():
         self.output_path = output_path
         self.env.train_mode = True
         self._init_summary()
+        # for save_best
+        self.best_mean = -1e7
+        self.rolling_rewards = deque(maxlen=50)
+        self.save_path = save_path
 
     def _init_summary(self):
         self.train_reward = tf.placeholder(tf.float32, [])
@@ -249,6 +254,12 @@ class Trainer():
                 self.env.train_mode = False
                 mean_reward, std_reward = self.perform(-1)
                 self.env.train_mode = True
+            self.rolling_rewards.append(mean_reward)
+            assert len(self.rolling_rewards) > 0
+            cur_rolling_mean = sum(self.rolling_rewards) / len(self.rolling_rewards)
+            if cur_rolling_mean > self.best_mean:
+                self.best_mean = cur_rolling_mean
+                self.model.save(self.save_path, self.global_counter.cur_step, is_best=True)
             self._log_episode(global_step, mean_reward, std_reward)
         df = pd.DataFrame(self.data)
         df.to_csv(self.output_path + 'train_reward.csv')
