@@ -1,6 +1,6 @@
 seeds="0,1,2,3,4,5,6,7,8,9"
 # ia2c CU 2000
-exp_name="IA2C"
+exp_name="NeurComm"
 task_name="ATSC_grid"
 seed=2000
 CUDA_VISIBLE_DEIVCES=0 python main.py \
@@ -9,8 +9,6 @@ CUDA_VISIBLE_DEIVCES=0 python main.py \
 evaluate \
 --evaluation-seeds ${seeds} \
 --is_best True \
-
-
 
 # ia2c CU 2010
 # exp_name="IA2C"

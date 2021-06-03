@@ -50,7 +50,7 @@ class IA2C:
             out.append(cur_out)
         return out
 
-    def load(self, model_dir, checkpoint=None):
+    def load(self, model_dir, checkpoint=None, is_best=False):
         save_file = None
         save_step = 0
         if os.path.exists(model_dir):
@@ -67,6 +67,8 @@ class IA2C:
                             save_step = cur_step
             else:
                 save_file = 'checkpoint-' + str(int(checkpoint))
+            if is_best:
+                save_file = 'checkpoint_best-0'
         if save_file is not None:
             self.saver.restore(self.sess, model_dir + save_file)
             logging.info('Checkpoint loaded: %s' % save_file)

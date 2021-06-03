@@ -338,10 +338,15 @@ class Evaluator(Tester):
         self.env.cur_episode = 0
         self.env.init_data(is_record, record_stats, self.output_path)
         time.sleep(1)
+        rewards = []
         for test_ind in range(self.test_num):
             reward, _ = self.perform(test_ind, gui=self.gui)
             self.env.terminate()
+            rewards.append(reward)
             logging.info('test %i, avg reward %.2f' % (test_ind, reward))
             time.sleep(2)
             self.env.collect_tripinfo()
+        rewards = np.array(rewards)
+        print("###### The Final Results! ######")
+        print("mean: {:.3f}, std: {:.3f}".format(np.mean(rewards), np.std(rewards)))
         self.env.output_data()

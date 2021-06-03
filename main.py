@@ -18,6 +18,10 @@ from utils import (Counter, Trainer, Tester, Evaluator,
                    plot_evaluation, plot_train)
 
 
+def string2bool(item):
+    return item == 'True'
+
+
 def parse_args():
     default_base_dir = '/Users/tchu/Documents/rl_test/deeprl_dist/ia2c_grid_0.9'
     default_config_dir = './config/config_ia2c_grid.ini'
@@ -34,6 +38,7 @@ def parse_args():
                     default=','.join([str(i) for i in range(2000, 2500, 10)]),
                     help="random seeds for evaluation, split by ,")
     sp.add_argument('--demo', action='store_true', help="shows SUMO gui")
+    sp.add_argument('--is_best', type=string2bool)
     args = parser.parse_args()
     if not args.option:
         parser.print_help()
@@ -111,7 +116,7 @@ def train(args):
     model.save(dirs['model'], final_step)
 
 
-def evaluate_fn(agent_dir, output_dir, seeds, port, demo):
+def evaluate_fn(agent_dir, output_dir, seeds, port, demo, is_best):
     agent = agent_dir.split('/')[-1]
     if not check_dir(agent_dir):
         logging.error('Evaluation: %s does not exist!' % agent)
@@ -132,7 +137,7 @@ def evaluate_fn(agent_dir, output_dir, seeds, port, demo):
     if model is None:
         return
     model_dir = agent_dir + '/model/'
-    if not model.load(model_dir):
+    if not model.load(model_dir, is_best=is_best):
         return
     # collect evaluation data
     evaluator = Evaluator(env, model, output_dir, gui=demo)
@@ -154,7 +159,7 @@ def evaluate(args):
         seeds = []
     else:
         seeds = [int(s) for s in seeds.split(',')]
-    evaluate_fn(base_dir, output_dir, seeds, 1, args.demo)
+    evaluate_fn(base_dir, output_dir, seeds, 1, args.demo, args.is_best)
 
 
 if __name__ == '__main__':

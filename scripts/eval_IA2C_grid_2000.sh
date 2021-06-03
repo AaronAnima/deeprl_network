@@ -10,8 +10,6 @@ evaluate \
 --evaluation-seeds ${seeds} \
 --is_best True \
 
-
-
 # ia2c CU 2010
 # exp_name="IA2C"
 # task_name="ATSC_grid"
